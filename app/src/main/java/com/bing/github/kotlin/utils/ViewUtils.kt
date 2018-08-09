@@ -20,4 +20,8 @@ object ViewUtils {
         typedArray.recycle()
         return color
     }
+
+    fun getWindowBackground(context: Context): Int {
+        return getColorAttr(context, android.R.attr.windowBackground)
+    }
 }

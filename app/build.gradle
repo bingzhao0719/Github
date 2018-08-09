@@ -46,4 +46,5 @@ dependencies {
     implementation 'com.github.daniel-stoneuk:material-about-library:2.2.1'
     implementation "com.android.support:preference-v7:${ANDROID_SUPPORT_VERSION}"
     implementation "com.android.support:preference-v14:${ANDROID_SUPPORT_VERSION}"
+    implementation 'com.jakewharton.retrofit:retrofit2-kotlin-coroutines-experimental-adapter:1.0.0'
 }

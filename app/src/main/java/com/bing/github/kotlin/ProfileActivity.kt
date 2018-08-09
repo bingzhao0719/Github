@@ -34,9 +34,9 @@ class ProfileActivity : BaseActivity() {
         supportActionBar!!.setHomeButtonEnabled(true)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         val pagerAdapter = MyFragmentAdapter(supportFragmentManager)
-        pagerAdapter.addFragment("INFO", ProfileInfoFragment.start(mUser))
-        pagerAdapter.addFragment("ACTIVITY", MeFragment())
-        pagerAdapter.addFragment("STARRED", MeFragment())
+        pagerAdapter.addFragment(ProfileInfoFragment.start(mUser), "INFO")
+        pagerAdapter.addFragment(MeFragment(), "ACTIVITY")
+        pagerAdapter.addFragment(MeFragment(), "STARRED")
         mViewPager.adapter = pagerAdapter
         mTabLayout.setupWithViewPager(mViewPager)
         mLocation.text = mUser.location

@@ -35,8 +35,10 @@ class ProfileInfoFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_profile_info, container, false)
     }
 
-    fun showProfileInfo(user: User) {
-
+    fun showProfileInfo(user: User?) {
+        if (user == null){
+            return
+        }
         var nameStr = if (TextUtils.isEmpty(user.name)) user.login else user.name
         nameStr = if (user.isUser()) nameStr else "$nameStr(ORG)"
         name.text = nameStr

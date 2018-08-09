@@ -20,8 +20,15 @@ class RepoUserFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener,
     private val TAG: String = "wubingzhao"
     private val mUserPresenter: UserPresenter = UserPresenter(this)
     private val mAdapter: UserAdapter = UserAdapter()
-    private var mSearchModel = SearchModel()
-    private var mDataLoaded:Boolean = false
+    private var mHomeFragment: HomeFragment? = null
+    private var mDataLoaded: Boolean = false
+    private var mLastKeyword: String = ""
+
+    companion object {
+        fun start(): RepoUserFragment {
+            return RepoUserFragment()
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -34,31 +41,30 @@ class RepoUserFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener,
     }
 
     private fun init() {
+        mHomeFragment = parentFragment as HomeFragment
         mRefreshLayout.setOnRefreshListener(this)
         mRecyclerView.layoutManager = LinearLayoutManager(activity)
         mRecyclerView.adapter = mAdapter
         mAdapter.onItemClickListener = this
-        initSearchModel()
-    }
-
-    private fun initSearchModel() {
-        mSearchModel.type = SearchModel.SearchType.Repository
-        mSearchModel.keyword = "eventbus"
-        mSearchModel.page = 1
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         Log.i(TAG, "isVisibleToUser:$isVisibleToUser mDataLoaded:$mDataLoaded")
-        if (isVisibleToUser && !mDataLoaded && mSearchModel != null) {
+        if (!isVisibleToUser)
+            return
+        if (mHomeFragment == null || mHomeFragment!!.getSearchModel() == null)
+            return
+        if (mLastKeyword != mHomeFragment!!.getSearchModel().keyword || !mDataLoaded) {
             mDataLoaded = true
-            mUserPresenter.loadData(mSearchModel)
+            loadData(mHomeFragment!!.getSearchModel())
         }
     }
-    fun showLoading(){
+
+    fun showLoading() {
         mRefreshLayout.isRefreshing = true
     }
 
-    public fun setNewData(data: List<User>) {
+    fun setNewData(data: List<User>) {
         Log.i(TAG, "setNewData user data:" + data.size + "::" + Thread.currentThread().name)
         mRefreshLayout.isRefreshing = false
         mAdapter.setNewData(data)
@@ -66,13 +72,18 @@ class RepoUserFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener,
 
     override fun onRefresh() {
         mRefreshLayout.isRefreshing = true
-        mUserPresenter.loadData(mSearchModel)
+        loadData(mHomeFragment!!.getSearchModel())
     }
 
     override fun onItemClick(adapter: BaseQuickAdapter<*, *>, view: View, position: Int) {
         Log.i(TAG, "onItemClick position:$position")
-        var user:User = adapter.getItem(position) as User
-        ProfileActivity.start(user,context!!)
+        var user: User = adapter.getItem(position) as User
+        ProfileActivity.start(user, context!!)
+    }
+
+    fun loadData(searchModel: SearchModel) {
+        mUserPresenter.loadData(searchModel)
+        mLastKeyword = searchModel.keyword.toString()
     }
 
 }

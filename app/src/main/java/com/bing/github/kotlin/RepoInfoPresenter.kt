@@ -6,12 +6,12 @@ import com.bing.github.kotlin.http.GithubService
 import com.bing.github.kotlin.model.Repository
 import com.bing.github.kotlin.utils.HtmlHelper
 import com.bing.github.kotlin.utils.HttpUtils
+import com.jakewharton.retrofit2.adapter.kotlin.coroutines.experimental.CoroutineCallAdapterFactory
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.CoroutineStart
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 
@@ -39,14 +39,14 @@ class RepoInfoPresenter constructor(repoInfoFragment: RepoInfoFragment) {
         val retrofit = Retrofit.Builder()
                 .baseUrl(HttpUtils.GITHUB_API_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addCallAdapterFactory(CoroutineCallAdapterFactory())
                 .build()
         val githubService: GithubService = retrofit.create(GithubService::class.java)
         var call = githubService.getFileAsHtmlStream(true,readmeFileUrl)
         var deferred = async(CommonPool, CoroutineStart.LAZY) {
             Log.i("wubingzhao", "readmeFileUrl:$readmeFileUrl")
             var response = call.execute()
-            readmeSource = response.body().string()
+            readmeSource = response.body()!!.string()
             Log.i("wubingzhao", "readmeSource:$readmeSource")
             HtmlHelper.generateMdHtml(readmeSource!!, baseUrl, false,
                     "", "", true)

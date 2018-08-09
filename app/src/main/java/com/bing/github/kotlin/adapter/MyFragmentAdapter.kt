@@ -20,8 +20,11 @@ open class MyFragmentAdapter(fm: FragmentManager?) : FragmentPagerAdapter(fm) {
         return titleList[position]
     }
 
-    fun addFragment(title: CharSequence, fragment: Fragment) {
+    fun addFragment(fragment: Fragment,title: CharSequence = "") {
         titleList.add(title)
         fragmentList.add(fragment)
+    }
+    fun getFragment(position: Int):Fragment{
+        return fragmentList[position]
     }
 }

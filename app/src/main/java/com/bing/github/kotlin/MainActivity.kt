@@ -2,13 +2,11 @@ package com.bing.github.kotlin
 
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.view.ViewPager
+import com.bing.github.kotlin.adapter.MyFragmentAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : BaseActivity() {
-    var mFragments: ArrayList<Fragment> = ArrayList(3)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -17,19 +15,12 @@ class MainActivity : BaseActivity() {
     }
 
     private fun init() {
-        mFragments.add(HomeFragment())
-        mFragments.add(DashboardFragment())
-        mFragments.add(MeFragment())
-        val pagerAdapter = object : FragmentPagerAdapter(supportFragmentManager) {
-            override fun getCount(): Int {
-                return mFragments.size
-            }
-
-            override fun getItem(position: Int): Fragment {
-                return mFragments[position]
-            }
-        }
+        val pagerAdapter = MyFragmentAdapter(supportFragmentManager)
+        pagerAdapter.addFragment(HomeFragment())
+        pagerAdapter.addFragment(DashboardFragment())
+        pagerAdapter.addFragment(MeFragment())
         mViewPager.adapter = pagerAdapter
+        mViewPager.offscreenPageLimit = 3
         mViewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrolled(position: Int,
                                         positionOffset: Float,

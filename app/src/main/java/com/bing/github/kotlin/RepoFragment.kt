@@ -21,7 +21,15 @@ class RepoFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener,
 
     private val mRepoInfoPresenter: RepoPresenter = RepoPresenter(this)
     private val mAdapter: RepoInfoAdapter = RepoInfoAdapter()
-    private var mSearchModel = SearchModel()
+    private var mHomeFragment: HomeFragment? = null
+    private var mDataLoaded: Boolean = false
+    private var mLastKeyword: String = ""
+
+    companion object {
+        fun start(): RepoFragment {
+            return RepoFragment()
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -34,24 +42,21 @@ class RepoFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener,
     }
 
     private fun init() {
+        mHomeFragment = parentFragment as HomeFragment
         mRefreshLayout.setOnRefreshListener(this)
         mRecyclerView.layoutManager = LinearLayoutManager(activity)
         mRecyclerView.adapter = mAdapter
         mAdapter.onItemClickListener = this
-        initSearchModel()
-        mRepoInfoPresenter.loadData(mSearchModel)
+        loadData(mHomeFragment!!.getSearchModel())
     }
 
-    private fun initSearchModel() {
-        mSearchModel.type = SearchModel.SearchType.Repository
-        mSearchModel.keyword = "eventbus"
-        mSearchModel.page = 1
-    }
-    fun showLoading(){
+    fun showLoading() {
         mRefreshLayout.isRefreshing = true
     }
 
-    public fun setNewData(data: List<Repository>) {
+    fun setNewData(data: List<Repository>?) {
+        if (data == null)
+            return
         Log.i(TAG, "setNewData data:" + data.size + "::" + Thread.currentThread().name)
         mRefreshLayout.isRefreshing = false
         mAdapter.setNewData(data)
@@ -59,13 +64,30 @@ class RepoFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener,
 
     override fun onRefresh() {
         mRefreshLayout.isRefreshing = true
-        mRepoInfoPresenter.loadData(mSearchModel)
+        loadData(mHomeFragment!!.getSearchModel())
     }
 
     override fun onItemClick(adapter: BaseQuickAdapter<*, *>, view: View, position: Int) {
         Log.i(TAG, "onItemClick position:$position")
         var item: Repository = adapter.getItem(position) as Repository
         RepoDetailActivity.start(item, context!!)
+    }
+
+    fun loadData(searchModel: SearchModel) {
+        mRepoInfoPresenter.loadData(searchModel)
+        mLastKeyword = searchModel.keyword.toString()
+    }
+
+    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
+        Log.i(TAG, "isVisibleToUser:$isVisibleToUser mDataLoaded:$mDataLoaded")
+        if (!isVisibleToUser)
+            return
+        if (mHomeFragment == null || mHomeFragment!!.getSearchModel() == null)
+            return
+        if (mLastKeyword != mHomeFragment!!.getSearchModel().keyword || !mDataLoaded) {
+            mDataLoaded = true
+            loadData(mHomeFragment!!.getSearchModel())
+        }
     }
 
 

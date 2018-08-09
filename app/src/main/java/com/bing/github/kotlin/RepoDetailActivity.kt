@@ -38,10 +38,10 @@ class RepoDetailActivity : BaseActivity() {
         supportActionBar!!.setHomeButtonEnabled(true)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         val pagerAdapter = MyFragmentAdapter(supportFragmentManager)
-        pagerAdapter.addFragment("INFO", RepoInfoFragment.start(mCurrRepo))
-        pagerAdapter.addFragment("FILES", RepoUserFragment())
-        pagerAdapter.addFragment("COMMITS", RepoUserFragment())
-        pagerAdapter.addFragment("ACTIVITY", RepoUserFragment())
+        pagerAdapter.addFragment(RepoInfoFragment.start(mCurrRepo), "INFO")
+        pagerAdapter.addFragment(MeFragment(), "FILES")
+        pagerAdapter.addFragment(MeFragment(), "COMMITS")
+        pagerAdapter.addFragment(MeFragment(), "ACTIVITY")
         mViewPager.adapter = pagerAdapter
         mTabLayout.setupWithViewPager(mViewPager)
         mDesc.text = mCurrRepo.description
